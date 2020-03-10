@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<a class="navbar-brand" href="/logout">{{ current_user.name }} {{current_user.surname}}</a>
+{% else %}
+<p>
+    <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
+    <a class="btn btn-success" href="/login">Войти</a>
+</p>
+{% endif %}
+{% if current_user.is_authenticated %}
+<a class="btn btn-primary " href="/newjob">Добавьте новую работу</a>
+<div><h1 align="center">Works log</h1>
+</div>
+{% for job in jobs %}
+<h3>Action #{{ loop.index}} </h3>
+<table class="table table-sm">
+    <thead class="table-active">
+    <tr>
+        <th scope="col">Title of activity</th>
+        <th scope="col">Team leader</th>
+        <th scope="col">Duration</th>
+        <th scope="col">List of collaborates</th>
+        <th scope="col">Is finished</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="table-primary">{{job.description}}</td>
+        <td class="table-primary">{{job.team_leader.surname}} {{job.team_leader.name}}</td>
+        <td class="table-primary">{{job.work_size}} hours</td>
+        <td class="table-primary">{{job.collaborators}}</td>
+        <td class="table-danger">
+            {% if job.is_finished %}
+            Is finished
+            {% else %}
+            Is not finished
+            {% endif %}
+        </td>
+    </tr>
+    </tbody>
+</table>
+{% endfor %}
+{% endif %}
+{% endblock %}
