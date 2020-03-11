@@ -4,6 +4,7 @@ from werkzeug.exceptions import abort
 from data.users import *
 from werkzeug.utils import redirect
 from data.jobs import Jobs
+import jobs_api
 
 from data import db_session
 from data.users import User
@@ -19,7 +20,8 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("mars_explorer.db")
-    app.run(port=8080, host='127.0.0.1')
+    app.register_blueprint(jobs_api.blueprint)
+    app.run(port=5000, host='127.0.0.1', )
 
 
 def set_password(self, password):
@@ -36,7 +38,7 @@ def index():
     jobs = []
     if current_user.is_authenticated:
         for job in session.query(Jobs).filter(
-                Jobs.team_leader_id == current_user.id): # | Jobs.collaborators.any(current_user.id)):
+                Jobs.team_leader_id == current_user.id):  # | Jobs.collaborators.any(current_user.id)):
             jobs.append(job)
     return render_template("index.html", jobs=jobs)
 
@@ -108,7 +110,6 @@ def newjob():
             description=form.description.data,
             work_size=form.work_size.data,
             start_date=form.start_date.data,
-            # collaborators=list(map(int, form.collaborators.data.split(","))),
             is_finished=form.is_finished.data
         )
         session.add(newjob)

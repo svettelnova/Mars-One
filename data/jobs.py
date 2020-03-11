@@ -2,20 +2,23 @@ import datetime
 import sqlalchemy
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
+from flask_login import UserMixin
+from sqlalchemy_serializer import SerializerMixin
 
 collaborators = sqlalchemy.Table('collaborators', SqlAlchemyBase.metadata,
-    sqlalchemy.Column('user', sqlalchemy.Integer,
-                      sqlalchemy.ForeignKey('users.id')),
-    sqlalchemy.Column('jobs', sqlalchemy.Integer,
-                      sqlalchemy.ForeignKey('jobs.id'))
-)
+                                 sqlalchemy.Column('user', sqlalchemy.Integer,
+                                                   sqlalchemy.ForeignKey('users.id')),
+                                 sqlalchemy.Column('jobs', sqlalchemy.Integer,
+                                                   sqlalchemy.ForeignKey('jobs.id'))
+                                 )
 
-class Jobs(SqlAlchemyBase):
+
+class Jobs(SqlAlchemyBase, SerializerMixin,UserMixin):
     __tablename__ = 'jobs'
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     team_leader_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                      sqlalchemy.ForeignKey("users.id"))
+                                       sqlalchemy.ForeignKey("users.id"))
     team_leader = orm.relation('User')
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     work_size = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
