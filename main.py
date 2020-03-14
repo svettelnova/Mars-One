@@ -5,17 +5,24 @@ from data.users import *
 from werkzeug.utils import redirect
 from data.jobs import Jobs
 import jobs_api
-
+from flask_restful import Api
 from data import db_session
 from data.users import User
 from forms.login import LoginForm
 from forms.register import RegisterForm
 from forms.jobs import JobsForm
-
+from api_dir import users_resources
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# для списка объектов
+api.add_resource(users_resources.UserListResource, '/api/v2/users')
+
+# для одного объекта
+api.add_resource(users_resources.UserResource, '/api/v2/news/<int:user_id>')
 
 
 def main():
