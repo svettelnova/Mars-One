@@ -72,6 +72,24 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
+@app.route('/jobs', methods=['GET', 'POST'])
+@login_required
+def add_news():
+    form = JobsForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        news = Jobs()
+        news.title = form.title.data
+        news.content = form.content.data
+        news.is_private = form.is_private.data
+        current_user.news.append(news)
+        session.merge(current_user)
+        session.commit()
+        return redirect('/')
+    return render_template('jobs.html',
+                           form=form)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     session = db_session.create_session()
@@ -110,8 +128,11 @@ def newjob():
             description=form.description.data,
             work_size=form.work_size.data,
             start_date=form.start_date.data,
-            is_finished=form.is_finished.data
+            is_finished=form.is_finished.data,
         )
+        colls = list(map(int, form.collaborators.data.split(',')))
+        for col in colls:
+            newjob.collaborators.append(col)
         session.add(newjob)
         session.commit()
         return redirect('/')
