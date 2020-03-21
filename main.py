@@ -12,6 +12,7 @@ from forms.login import LoginForm
 from forms.register import RegisterForm
 from forms.jobs import JobsForm
 from api_dir import users_resources
+
 app = Flask(__name__)
 api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -22,7 +23,7 @@ login_manager.init_app(app)
 api.add_resource(users_resources.UserListResource, '/api/v2/users')
 
 # для одного объекта
-api.add_resource(users_resources.UserResource, '/api/v2/news/<int:user_id>')
+api.add_resource(users_resources.UserResource, '/api/v2/users/<int:user_id>')
 
 
 def main():
@@ -70,7 +71,8 @@ def reqister():
             age=form.age.data,
             position=form.position.data,
             speciality=form.speciality.data,
-            address=form.address.data
+            address=form.address.data,
+            hashed_password=form.hashed_password.data
         )
         user.set_password(form.password.data)
         session.add(user)
@@ -82,6 +84,8 @@ def reqister():
 @app.route('/jobs', methods=['GET', 'POST'])
 @login_required
 def add_news():
+    if not current_user.is_authenticated:
+        return redirect('/')
     form = JobsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
@@ -127,6 +131,8 @@ def logout():
 
 @app.route('/newjob', methods=['GET', 'POST'])
 def newjob():
+    if not current_user.is_authenticated:
+        return redirect('/')
     form = JobsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
